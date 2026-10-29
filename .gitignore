@@ -6,3 +6,15 @@ bin/
 *.out
 .vscode/
 .idea/
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+Makefile
+
+# IDE and OS files
+.DS_Store
+*.user
+*.suo
