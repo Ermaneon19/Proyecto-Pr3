@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Enemy.hpp"
+
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Time.hpp>
 
@@ -19,5 +21,6 @@ private:
     void render();
 
     sf::RenderWindow window_;
+    Enemy enemy_{100.0f, 100.0f};
     bool imguiInitialized_{false};
 };

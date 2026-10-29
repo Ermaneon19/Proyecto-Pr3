@@ -4,6 +4,7 @@
 #include <imgui.h>
 
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/System/Clock.hpp>
@@ -47,11 +48,17 @@ void Game::processEvents() {
 
 void Game::update(sf::Time deltaTime) {
     ImGui::SFML::Update(window_, deltaTime);
-    ImGui::ShowDemoWindow();
+
+    const auto mousePosition = sf::Mouse::getPosition(window_);
+    enemy_.update(
+        static_cast<float>(mousePosition.x) - 16.0f,
+        static_cast<float>(mousePosition.y) - 16.0f,
+        deltaTime.asSeconds());
 }
 
 void Game::render() {
     window_.clear(sf::Color(30, 30, 30));
+    enemy_.draw(window_);
     ImGui::SFML::Render(window_);
     window_.display();
 }

@@ -1,7 +1,7 @@
 # Proyecto-Pr3
 
 Base de un proyecto C++17 con SFML 2.6.1 y Dear ImGui mediante ImGui-SFML.
-Al iniciar, abre una ventana de 800x600 con la ventana de demostracion de ImGui.
+Al iniciar, muestra un enemigo que persigue el cursor como objetivo temporal.
 
 ## Estructura
 
