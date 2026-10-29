@@ -1,7 +1,9 @@
 # Proyecto-Pr3
 
-Base de un proyecto C++17 con SFML 2.6.1 y Dear ImGui mediante ImGui-SFML.
-Al iniciar, abre una ventana de 800x600 con la ventana de demostracion de ImGui.
+Base de un prototipo C++17 de supervivencia en arena, con SFML 2.6.1 y Dear
+ImGui mediante ImGui-SFML. La aplicacion abre un menu y permite iniciar la
+partida. El bucle principal ya tiene puntos de integracion para el jugador y
+los enemigos.
 
 ## Estructura
 
@@ -49,3 +51,14 @@ C++.
 Cada integrante puede clonar el repositorio y ejecutar los mismos comandos de
 CMake. La carpeta `build/` y los artefactos del compilador estan ignorados por
 Git; solo se deben compartir los archivos fuente y los recursos del juego.
+
+## Integracion del juego
+
+- `Game` administra los estados `MainMenu`, `Playing` y `GameOver`.
+- Los modulos del jugador y el mundo se conectaran al ciclo de actualizacion y
+  renderizado de `Game` durante la integracion.
+- Cuando el jugador pierde, el modulo responsable debe llamar a
+  `game.finishGame(puntajeFinal)` para mostrar el puntaje y habilitar el
+  reinicio.
+- Controles previstos: WASD o flechas para moverse, Espacio o clic para
+  disparar y Esc para volver al menu durante la partida.

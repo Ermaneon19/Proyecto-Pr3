@@ -5,6 +5,12 @@
 
 class Game {
 public:
+    enum class State {
+        MainMenu,
+        Playing,
+        GameOver
+    };
+
     Game();
     ~Game();
 
@@ -12,6 +18,7 @@ public:
     Game& operator=(const Game&) = delete;
 
     void run();
+    void finishGame(int finalScore);
 
 private:
     void processEvents();
@@ -20,4 +27,6 @@ private:
 
     sf::RenderWindow window_;
     bool imguiInitialized_{false};
+    State state_{State::MainMenu};
+    int finalScore_{0};
 };
