@@ -1,64 +1,64 @@
 #include "Game.hpp"
-
-#include <imgui-SFML.h>
-#include <imgui.h>
-
-#include <SFML/Graphics/Color.hpp>
 #include <SFML/Window/Mouse.hpp>
-#include <SFML/Window/VideoMode.hpp>
-#include <SFML/Window/Event.hpp>
-#include <SFML/System/Clock.hpp>
-#include <stdexcept>
+#include <cstdlib>
+#include <ctime>
 
-Game::Game()
-    : window_(sf::VideoMode(800, 600), "Proyecto-Pr3") {
-    window_.setVerticalSyncEnabled(true);
+// 1. Constructor: Configura la ventana y genera los enemigos de prueba
+Game::Game() : window(sf::VideoMode(800, 600), "Código Crítico - Prueba Persona 3") {
+    std::srand(static_cast<unsigned int>(std::time(nullptr))); // Semilla para valores aleatorios
 
-    imguiInitialized_ = ImGui::SFML::Init(window_);
-    if (!imguiInitialized_) {
-        throw std::runtime_error("No se pudo inicializar ImGui-SFML.");
+    // Aparecen 5 enemigos en posiciones aleatorias de la pantalla
+    for (int i = 0; i < 5; ++i) {
+        swarm.append(Enemy(std::rand() % 800, std::rand() % 600));
     }
 }
 
-Game::~Game() {
-    if (imguiInitialized_) {
-        ImGui::SFML::Shutdown(window_);
-    }
-}
-
+// 2. Bucle principal del juego
 void Game::run() {
-    sf::Clock deltaClock;
+    while (window.isOpen()) {
+        float deltaTime = clock.restart().asSeconds();
 
-    while (window_.isOpen()) {
         processEvents();
-        update(deltaClock.restart());
+        update(deltaTime);
         render();
     }
 }
 
+// 3. Procesar eventos (cerrar la ventana, etc.)
 void Game::processEvents() {
-    sf::Event event{};
-    while (window_.pollEvent(event)) {
-        ImGui::SFML::ProcessEvent(window_, event);
+    sf::Event event;
+    while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
-            window_.close();
+            window.close();
         }
     }
 }
 
-void Game::update(sf::Time deltaTime) {
-    ImGui::SFML::Update(window_, deltaTime);
+// 4. Actualizar lógica matemática
+void Game::update(float deltaTime) {
+    // Capturar la posición actual del ratón como "objetivo"
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    float targetX = static_cast<float>(mousePos.x);
+    float targetY = static_cast<float>(mousePos.y);
 
-    const auto mousePosition = sf::Mouse::getPosition(window_);
-    enemy_.update(
-        static_cast<float>(mousePosition.x) - 16.0f,
-        static_cast<float>(mousePosition.y) - 16.0f,
-        deltaTime.asSeconds());
+    // Iterar tu lista de DeSiGNAR para mover a cada enemigo
+    auto it = swarm.begin();
+    while (it != swarm.end()) {
+        it->update(targetX, targetY, deltaTime);
+        ++it;
+    }
 }
 
+// 5. Renderizar gráficos
 void Game::render() {
-    window_.clear(sf::Color(30, 30, 30));
-    enemy_.draw(window_);
-    ImGui::SFML::Render(window_);
-    window_.display();
+    window.clear(); // Limpiar el frame anterior (fondo negro)
+
+    // Iterar tu lista de DeSiGNAR para dibujar cada enemigo
+    auto it = swarm.begin();
+    while (it != swarm.end()) {
+        it->draw(window);
+        ++it;
+    }
+
+    window.display(); // Mostrar el nuevo frame en pantalla
 }

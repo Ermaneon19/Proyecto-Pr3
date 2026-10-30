@@ -10,9 +10,9 @@ Al iniciar, muestra un enemigo que persigue el cursor como objetivo temporal.
 - `assets/`: sprites, fuentes y sonidos del juego.
 - `CMakeLists.txt`: descarga y configura las dependencias, y define el ejecutable.
 
-SFML, Dear ImGui e ImGui-SFML se descargan con CMake en `build/_deps`; no es
-necesario copiar dependencias a `vendor/`. La primera configuracion requiere
-conexion a Internet.
+SFML, Dear ImGui, ImGui-SFML y DeSiGNAR se descargan con CMake en `build/_deps`;
+no es necesario copiar dependencias a `vendor/`. La primera configuracion
+requiere conexion a Internet.
 
 ## Requisitos
 

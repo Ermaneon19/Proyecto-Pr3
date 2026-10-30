@@ -1,29 +1,26 @@
 #include "Enemy.hpp"
-
 #include <cmath>
 
-Enemy::Enemy(float startX, float startY)
-    : shape(sf::Vector2f(32.0f, 32.0f)), speed(120.0f), hp(3) {
-    shape.setPosition(startX, startY);
+Enemy::Enemy(float startX, float startY) : speed(100.0f), hp(3) {
+    shape.setSize(sf::Vector2f(32.0f, 32.0f)); 
     shape.setFillColor(sf::Color::Red);
+    shape.setPosition(startX, startY);
 }
 
 void Enemy::update(float targetX, float targetY, float deltaTime) {
-    const auto currentPosition = shape.getPosition();
-    const float targetCenterX = targetX + 16.0f;
-    const float targetCenterY = targetY + 16.0f;
-    const float enemyCenterX = currentPosition.x + shape.getSize().x / 2.0f;
-    const float enemyCenterY = currentPosition.y + shape.getSize().y / 2.0f;
+    sf::Vector2f currentPos = shape.getPosition();
 
-    const float deltaX = targetCenterX - enemyCenterX;
-    const float deltaY = targetCenterY - enemyCenterY;
-    const float distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
+    float dx = targetX - currentPos.x;
+    float dy = targetY - currentPos.y;
+
+    float distance = std::sqrt(dx * dx + dy * dy);
 
     if (distance > 0.0f) {
-        const float stepX = (deltaX / distance) * speed * deltaTime;
-        const float stepY = (deltaY / distance) * speed * deltaTime;
-        shape.move(stepX, stepY);
+        dx /= distance;
+        dy /= distance;
     }
+
+    shape.move(dx * speed * deltaTime, dy * speed * deltaTime);
 }
 
 void Enemy::draw(sf::RenderWindow& window) {

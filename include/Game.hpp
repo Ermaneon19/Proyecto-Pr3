@@ -1,26 +1,23 @@
 #pragma once
 
-#include "Enemy.hpp"
-
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/System/Time.hpp>
+#include <SFML/Graphics.hpp>
+#include <list.hpp>            // Contenedor de tu oleada
+#include "Enemy.hpp"           // Tu clase
 
 class Game {
-public:
-    Game();
-    ~Game();
-
-    Game(const Game&) = delete;
-    Game& operator=(const Game&) = delete;
-
-    void run();
-
 private:
+    sf::RenderWindow window;
+    sf::Clock clock;
+
+    // Tu área de responsabilidad: La lista de enemigos
+    Designar::SLList<Enemy> swarm;
+
+    // Métodos del bucle principal
     void processEvents();
-    void update(sf::Time deltaTime);
+    void update(float deltaTime);
     void render();
 
-    sf::RenderWindow window_;
-    Enemy enemy_{100.0f, 100.0f};
-    bool imguiInitialized_{false};
+public:
+    Game();
+    void run();
 };
