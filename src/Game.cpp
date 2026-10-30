@@ -13,11 +13,13 @@
 Game::Game()
     : window_(sf::VideoMode(800, 600), "Ciber Arena") {
     window_.setVerticalSyncEnabled(true);
+    window_.setMouseCursorVisible(true);
 
     imguiInitialized_ = ImGui::SFML::Init(window_);
     if (!imguiInitialized_) {
         throw std::runtime_error("No se pudo inicializar ImGui-SFML.");
     }
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 }
 
 Game::~Game() {
@@ -57,6 +59,7 @@ void Game::update(sf::Time deltaTime) {
     ImGui::SFML::Update(window_, deltaTime);
 
     ImGui::SetNextWindowPos(ImVec2(24.0f, 24.0f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(520.0f, 240.0f), ImGuiCond_Always);
     ImGui::Begin("Ciber Arena");
     ImGui::TextUnformatted("Supervivencia incremental en la arena");
     ImGui::Separator();
@@ -74,7 +77,10 @@ void Game::update(sf::Time deltaTime) {
     case State::Playing:
         ImGui::TextUnformatted("Partida en curso");
         ImGui::TextUnformatted("Jugador y enemigos: modulos en integracion.");
-        ImGui::TextUnformatted("Esc: volver al menu");
+        if (ImGui::Button("Volver al menu principal")) {
+            state_ = State::MainMenu;
+        }
+        ImGui::TextUnformatted("Tambien puedes pulsar Esc.");
         break;
     case State::GameOver:
         ImGui::TextUnformatted("Fin de la partida");
