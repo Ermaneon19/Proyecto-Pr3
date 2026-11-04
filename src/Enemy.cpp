@@ -1,7 +1,7 @@
 #include "Enemy.hpp"
 #include <cmath>
 
-Enemy::Enemy(float startX, float startY) : speed(100.0f), hp(3) {
+Enemy::Enemy(float startX, float startY) : speed(100.0f), hp(3), active(true) {
     shape.setSize(sf::Vector2f(32.0f, 32.0f)); 
     shape.setFillColor(sf::Color::Red);
     shape.setPosition(startX, startY);
@@ -29,4 +29,22 @@ void Enemy::draw(sf::RenderWindow& window) {
 
 sf::FloatRect Enemy::getBounds() const {
     return shape.getGlobalBounds();
+}
+
+// NUEVO: Reduce la vida y lo desactiva si llega a 0
+void Enemy::takeDamage() {
+    hp--;
+    if (hp <= 0) {
+        active = false;
+        shape.setFillColor(sf::Color(100, 100, 100)); // Cambia a gris al morir
+    }
+}
+
+// NUEVO: Retorna si sigue vivo
+bool Enemy::isActive() const {
+    return active;
+}
+
+sf::Vector2f Enemy::getPosition() const {
+    return shape.getPosition();
 }

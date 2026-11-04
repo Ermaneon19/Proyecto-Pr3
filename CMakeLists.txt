@@ -62,6 +62,7 @@ add_executable(ProyectoPr3
     src/Game.cpp
     src/AssetManager.cpp
     src/Enemy.cpp
+    src/Core.cpp
 )
 
 target_include_directories(ProyectoPr3 PRIVATE include)

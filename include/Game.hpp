@@ -1,18 +1,20 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <list.hpp>            // Contenedor de tu oleada
-#include "Enemy.hpp"           // Tu clase
+#include <list.hpp>
+#include "Enemy.hpp"
+#include "Core.hpp" 
 
 class Game {
 private:
     sf::RenderWindow window;
     sf::Clock clock;
 
-    // Tu área de responsabilidad: La lista de enemigos
     Designar::SLList<Enemy> swarm;
+    Designar::SLList<Core> cores; 
 
-    // Métodos del bucle principal
+    int score = 0; 
+
     void processEvents();
     void update(float deltaTime);
     void render();
