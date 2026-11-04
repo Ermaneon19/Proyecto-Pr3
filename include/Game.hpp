@@ -10,6 +10,10 @@ private:
     sf::RenderWindow window;
     sf::Clock clock;
 
+    // Variables para cargar la imagen y textura del insecto una sola vez
+    sf::Image enemyImage;
+    sf::Texture enemyTexture;
+
     Designar::SLList<Enemy> swarm;
     Designar::SLList<Core> cores; 
 

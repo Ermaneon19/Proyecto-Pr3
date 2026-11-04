@@ -3,21 +3,26 @@
 
 class Enemy {
 private:
-    sf::RectangleShape shape;
+    sf::Sprite sprite;
     float speed;
     int hp;
-    bool active; // NUEVO: Para saber si el enemigo sigue vivo
+    bool active;
+
+    // Control de animación
+    int currentFrame;
+    float animationTimer;
+    int frameWidth;
+    int frameHeight;
 
 public:
-    Enemy(float startX, float startY);
+    // El constructor ahora exige recibir la textura ya cargada
+    Enemy(float startX, float startY, const sf::Texture& texture);
     
     void update(float targetX, float targetY, float deltaTime);
     void draw(sf::RenderWindow& window);
     sf::FloatRect getBounds() const;
     
-    // NUEVO: Métodos para recibir daño y consultar su estado
     void takeDamage();
     bool isActive() const;
-
     sf::Vector2f getPosition() const;
 };

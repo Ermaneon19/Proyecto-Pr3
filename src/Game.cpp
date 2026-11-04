@@ -2,12 +2,23 @@
 #include <SFML/Window/Mouse.hpp>
 #include <cstdlib>
 #include <ctime>
+#include <stdexcept>
+#include <string>
 
 Game::Game() : window(sf::VideoMode(800, 600), "Código Crítico - Prueba Persona 3") {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
+    // Cargar imagen y quitar el fondo blanco
+    const char* enemyImagePath = "assets/Sprite de Insecto Mecánico en Movimiento.png";
+    if (!enemyImage.loadFromFile(enemyImagePath)) {
+        throw std::runtime_error(std::string("No se pudo cargar la imagen: ") + enemyImagePath);
+    }
+    enemyImage.createMaskFromColor(sf::Color::White);
+    enemyTexture.loadFromImage(enemyImage);
+
     for (int i = 0; i < 5; ++i) {
-        swarm.append(Enemy(std::rand() % 800, std::rand() % 600));
+        // Pasamos la textura cargada al constructor del enemigo
+        swarm.append(Enemy(std::rand() % 800, std::rand() % 600, enemyTexture));
     }
 }
 
