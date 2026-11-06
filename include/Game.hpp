@@ -1,23 +1,29 @@
 #pragma once
 
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/System/Time.hpp>
+#include <SFML/Graphics.hpp>
+#include <list.hpp>
+#include "Enemy.hpp"
+#include "Core.hpp" 
 
 class Game {
-public:
-    Game();
-    ~Game();
-
-    Game(const Game&) = delete;
-    Game& operator=(const Game&) = delete;
-
-    void run();
-
 private:
+    sf::RenderWindow window;
+    sf::Clock clock;
+
+    // Variables para cargar la imagen y textura del insecto una sola vez
+    sf::Image enemyImage;
+    sf::Texture enemyTexture;
+
+    Designar::SLList<Enemy> swarm;
+    Designar::SLList<Core> cores; 
+
+    int score = 0; 
+
     void processEvents();
-    void update(sf::Time deltaTime);
+    void update(float deltaTime);
     void render();
 
-    sf::RenderWindow window_;
-    bool imguiInitialized_{false};
+public:
+    Game();
+    void run();
 };
