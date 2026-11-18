@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+# Compila la GDExtension de Codigo Critico (C++ puro con godot-cpp).
+#
+#   scons platform=linux   target=template_debug
+#   scons platform=windows target=template_debug use_mingw=yes
+#
+# Las librerias quedan en project/bin/ y las carga project/bin/codigo_critico.gdextension
+
+env = SConscript("godot-cpp/SConstruct")
+
+env.Append(CPPPATH=["src/"])
+sources = Glob("src/*.cpp")
+
+library = env.SharedLibrary(
+    "project/bin/libcodigocritico{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+    source=sources,
+)
+
+Default(library)

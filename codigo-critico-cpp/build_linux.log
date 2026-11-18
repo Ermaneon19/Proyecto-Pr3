@@ -1,0 +1,126 @@
+scons: Reading SConscript files ...
+Building for architecture x86_64 on platform linux
+scons: done reading SConscript files.
+scons: Building targets ...
+scons: `godot-cpp/bin/libgodot-cpp.linux.template_debug.x86_64.a' is up to date.
+Compiling shared src/batch.cpp ...
+Compiling shared src/game.cpp ...
+Compiling shared src/hud.cpp ...
+Compiling shared src/mesh_util.cpp ...
+Compiling shared src/player.cpp ...
+Compiling shared src/register_types.cpp ...
+Compiling shared src/screens.cpp ...
+Compiling shared src/ui_util.cpp ...
+In file included from godot-cpp/include/godot_cpp/core/class_db.hpp:45,
+                 from godot-cpp/gen/include/godot_cpp/classes/ref_counted.hpp:39,
+                 from godot-cpp/include/godot_cpp/classes/ref.hpp:37,
+                 from godot-cpp/gen/include/godot_cpp/classes/node.hpp:41,
+                 from godot-cpp/gen/include/godot_cpp/classes/canvas_item.hpp:38,
+                 from godot-cpp/gen/include/godot_cpp/classes/control.hpp:36,
+                 from src/screens.h:5,
+                 from src/screens.cpp:1:
+src/screens.cpp: In member function 'virtual void cc::MainMenu::_ready()':
+src/screens.cpp:79:93: error: 'void cc::ScreenBase::go_register()' is protected within this context
+   79 |         start->connect("pressed", callable_mp(static_cast<ScreenBase *>(this), &ScreenBase::go_register));
+      |                                                                                             ^~~~~~~~~~~
+godot-cpp/include/godot_cpp/variant/callable_method_pointer.hpp:268:79: note: in definition of macro 'callable_mp'
+  268 | #define callable_mp(I, M) ::godot::create_custom_callable_function_pointer(I, M)
+      |                                                                               ^
+src/screens.cpp:45:6: note: declared protected here
+   45 | void ScreenBase::go_register() {
+      |      ^~~~~~~~~~
+src/screens.cpp:83:95: error: 'void cc::ScreenBase::go_ranking()' is protected within this context
+   83 |         ranking->connect("pressed", callable_mp(static_cast<ScreenBase *>(this), &ScreenBase::go_ranking));
+      |                                                                                               ^~~~~~~~~~
+godot-cpp/include/godot_cpp/variant/callable_method_pointer.hpp:268:79: note: in definition of macro 'callable_mp'
+  268 | #define callable_mp(I, M) ::godot::create_custom_callable_function_pointer(I, M)
+      |                                                                               ^
+src/screens.cpp:51:6: note: declared protected here
+   51 | void ScreenBase::go_ranking() {
+      |      ^~~~~~~~~~
+src/screens.cpp:87:92: error: 'void cc::ScreenBase::go_shop()' is protected within this context
+   87 |         shop->connect("pressed", callable_mp(static_cast<ScreenBase *>(this), &ScreenBase::go_shop));
+      |                                                                                            ^~~~~~~
+godot-cpp/include/godot_cpp/variant/callable_method_pointer.hpp:268:79: note: in definition of macro 'callable_mp'
+  268 | #define callable_mp(I, M) ::godot::create_custom_callable_function_pointer(I, M)
+      |                                                                               ^
+src/screens.cpp:54:6: note: declared protected here
+   54 | void ScreenBase::go_shop() {
+      |      ^~~~~~~~~~
+src/screens.cpp: In member function 'virtual void cc::RegisterScreen::_ready()':
+src/screens.cpp:138:92: error: 'void cc::ScreenBase::go_menu()' is protected within this context
+  138 |         back->connect("pressed", callable_mp(static_cast<ScreenBase *>(this), &ScreenBase::go_menu));
+      |                                                                                            ^~~~~~~
+godot-cpp/include/godot_cpp/variant/callable_method_pointer.hpp:268:79: note: in definition of macro 'callable_mp'
+  268 | #define callable_mp(I, M) ::godot::create_custom_callable_function_pointer(I, M)
+      |                                                                               ^
+src/screens.cpp:42:6: note: declared protected here
+   42 | void ScreenBase::go_menu() {
+      |      ^~~~~~~~~~
+src/screens.cpp: In member function 'virtual void cc::GameOverScreen::_ready()':
+src/screens.cpp:193:93: error: 'void cc::ScreenBase::go_game()' is protected within this context
+  193 |         retry->connect("pressed", callable_mp(static_cast<ScreenBase *>(this), &ScreenBase::go_game));
+      |                                                                                             ^~~~~~~
+godot-cpp/include/godot_cpp/variant/callable_method_pointer.hpp:268:79: note: in definition of macro 'callable_mp'
+  268 | #define callable_mp(I, M) ::godot::create_custom_callable_function_pointer(I, M)
+      |                                                                               ^
+src/screens.cpp:48:6: note: declared protected here
+   48 | void ScreenBase::go_game() {
+      |      ^~~~~~~~~~
+src/screens.cpp:197:95: error: 'void cc::ScreenBase::go_ranking()' is protected within this context
+  197 |         ranking->connect("pressed", callable_mp(static_cast<ScreenBase *>(this), &ScreenBase::go_ranking));
+      |                                                                                               ^~~~~~~~~~
+godot-cpp/include/godot_cpp/variant/callable_method_pointer.hpp:268:79: note: in definition of macro 'callable_mp'
+  268 | #define callable_mp(I, M) ::godot::create_custom_callable_function_pointer(I, M)
+      |                                                                               ^
+src/screens.cpp:51:6: note: declared protected here
+   51 | void ScreenBase::go_ranking() {
+      |      ^~~~~~~~~~
+src/screens.cpp:201:92: error: 'void cc::ScreenBase::go_menu()' is protected within this context
+  201 |         menu->connect("pressed", callable_mp(static_cast<ScreenBase *>(this), &ScreenBase::go_menu));
+      |                                                                                            ^~~~~~~
+godot-cpp/include/godot_cpp/variant/callable_method_pointer.hpp:268:79: note: in definition of macro 'callable_mp'
+  268 | #define callable_mp(I, M) ::godot::create_custom_callable_function_pointer(I, M)
+      |                                                                               ^
+src/screens.cpp:42:6: note: declared protected here
+   42 | void ScreenBase::go_menu() {
+      |      ^~~~~~~~~~
+src/screens.cpp: In member function 'virtual void cc::RankingScreen::_ready()':
+src/screens.cpp:283:92: error: 'void cc::ScreenBase::go_menu()' is protected within this context
+  283 |         back->connect("pressed", callable_mp(static_cast<ScreenBase *>(this), &ScreenBase::go_menu));
+      |                                                                                            ^~~~~~~
+godot-cpp/include/godot_cpp/variant/callable_method_pointer.hpp:268:79: note: in definition of macro 'callable_mp'
+  268 | #define callable_mp(I, M) ::godot::create_custom_callable_function_pointer(I, M)
+      |                                                                               ^
+src/screens.cpp:42:6: note: declared protected here
+   42 | void ScreenBase::go_menu() {
+      |      ^~~~~~~~~~
+src/screens.cpp: In member function 'void cc::ShopScreen::refresh(int)':
+src/screens.cpp:342:92: error: 'void cc::ScreenBase::go_menu()' is protected within this context
+  342 |         back->connect("pressed", callable_mp(static_cast<ScreenBase *>(this), &ScreenBase::go_menu));
+      |                                                                                            ^~~~~~~
+godot-cpp/include/godot_cpp/variant/callable_method_pointer.hpp:268:79: note: in definition of macro 'callable_mp'
+  268 | #define callable_mp(I, M) ::godot::create_custom_callable_function_pointer(I, M)
+      |                                                                               ^
+src/screens.cpp:42:6: note: declared protected here
+   42 | void ScreenBase::go_menu() {
+      |      ^~~~~~~~~~
+src/hud.cpp: In member function 'virtual void cc::Hud::_unhandled_input(const godot::Ref<godot::InputEvent>&)':
+src/hud.cpp:434:39: error: invalid use of incomplete type 'class godot::Viewport'
+  434 |                         get_viewport()->set_input_as_handled();
+      |                                       ^~
+In file included from godot-cpp/gen/include/godot_cpp/classes/canvas_layer.hpp:36,
+                 from src/hud.h:5,
+                 from src/hud.cpp:1:
+godot-cpp/gen/include/godot_cpp/classes/node.hpp:57:7: note: forward declaration of 'class godot::Viewport'
+   57 | class Viewport;
+      |       ^~~~~~~~
+src/hud.cpp:459:47: error: invalid use of incomplete type 'class godot::Viewport'
+  459 |                                 get_viewport()->set_input_as_handled();
+      |                                               ^~
+godot-cpp/gen/include/godot_cpp/classes/node.hpp:57:7: note: forward declaration of 'class godot::Viewport'
+   57 | class Viewport;
+      |       ^~~~~~~~
+scons: *** [src/screens.os] Error 1
+scons: *** [src/hud.os] Error 1
+scons: building terminated because of errors.
