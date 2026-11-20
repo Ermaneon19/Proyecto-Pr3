@@ -8,10 +8,12 @@
 
 env = SConscript("godot-cpp/SConstruct")
 
-env.Append(CPPPATH=["src/"])
-sources = Glob("src/*.cpp")
+env.Append(CPPPATH=["src/", "DeSiGNAR/include/"])
+project_env = env.Clone()
+project_env.Append(CXXFLAGS=["-fexceptions"])
+sources = Glob("src/*.cpp") + ["DeSiGNAR/src/hash.cpp"]
 
-library = env.SharedLibrary(
+library = project_env.SharedLibrary(
     "project/bin/libcodigocritico{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
     source=sources,
 )

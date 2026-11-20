@@ -216,6 +216,13 @@ void RankingScreen::_ready() {
 
 	v->add_child(ui::label("RANKING", 44, ui::AMBER, true));
 	v->add_child(ui::label("Los 10 mejores puntajes", 15, ui::MUTED, true));
+	if (const PlayerStats *stats = gd.find_player_stats(gd.player_name)) {
+		v->add_child(ui::label(
+				U8("Tus partidas: ") + String::num_int64(stats->games_played) +
+						U8("   ·   Récord personal: ") + String::num_int64(stats->best_score) +
+						U8("   ·   Bajas acumuladas: ") + String::num_int64(stats->total_kills),
+				16, ui::CYAN, true));
+	}
 	v->add_child(memnew(HSeparator));
 
 	if (gd.ranking.empty()) {

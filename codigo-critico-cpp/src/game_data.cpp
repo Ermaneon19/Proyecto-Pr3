@@ -10,8 +10,12 @@
 #include <godot_cpp/variant/dictionary.hpp>
 #include <godot_cpp/variant/variant.hpp>
 
+#include <array.hpp>
+#include <sort.hpp>
+
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 using namespace godot;
 
@@ -19,6 +23,30 @@ namespace cc {
 
 static const char *SAVE_PATH = "user://save.json";
 static const char *RANKING_PATH = "user://ranking.json";
+
+static std::string to_utf8_key(const String &name) {
+	CharString encoded = name.utf8();
+	return std::string(encoded.get_data(), size_t(encoded.length()));
+}
+
+static bool ranks_before(const RankEntry &a, const RankEntry &b) {
+	if (a.score != b.score) return a.score > b.score;
+	if (a.time != b.time) return a.time > b.time;
+	if (a.level != b.level) return a.level > b.level;
+	return a.kills > b.kills;
+}
+
+static void sort_ranking(std::vector<RankEntry> &ranking) {
+	Designar::DynArray<RankEntry> entries;
+	for (const RankEntry &entry : ranking) {
+		entries.append(entry);
+	}
+	Designar::merge_sort(entries, ranks_before);
+	ranking.clear();
+	for (const RankEntry &entry : entries) {
+		ranking.push_back(entry);
+	}
+}
 
 const MetaUpgradeDef GameData::UPGRADES[M_COUNT] = {
 	{ "damage", "Munición perforante", "+10% daño", 15, 20 },
@@ -79,14 +107,32 @@ void GameData::add_run_result(int score, int earned, float time_s, int kills, in
 	e.level = level;
 	e.time = time_s;
 
-	// Insercion ordenada: los empates quedan debajo de los puntajes anteriores.
+	// El orden coincide con el comparador usado por el merge sort de DeSiGNAR.
 	size_t pos = 0;
-	while (pos < ranking.size() && ranking[pos].score >= score) {
+	while (pos < ranking.size() && !ranks_before(e, ranking[pos])) {
 		pos++;
 	}
 	ranking.insert(ranking.begin() + pos, e);
+	sort_ranking(ranking);
 	if (int(ranking.size()) > MAX_RANKING) {
 		ranking.resize(MAX_RANKING);
+	}
+
+	std::string key = to_utf8_key(e.name);
+	size_t *stats_index = player_stats_index.search(key);
+	if (stats_index == nullptr) {
+		PlayerStats stats;
+		stats.name = e.name;
+		stats.games_played = 1;
+		stats.best_score = score;
+		stats.total_kills = kills;
+		player_stats.push_back(stats);
+		player_stats_index.insert(std::move(key), player_stats.size() - 1);
+	} else {
+		PlayerStats &stats = player_stats[*stats_index];
+		stats.games_played++;
+		stats.best_score = std::max(stats.best_score, score);
+		stats.total_kills += kills;
 	}
 
 	last_run.valid = true;
@@ -100,6 +146,14 @@ void GameData::add_run_result(int score, int earned, float time_s, int kills, in
 
 	save_game();
 	save_ranking();
+}
+
+const PlayerStats *GameData::find_player_stats(const String &name) const {
+	const size_t *index = player_stats_index.search(to_utf8_key(name.strip_edges()));
+	if (index == nullptr || *index >= player_stats.size()) {
+		return nullptr;
+	}
+	return &player_stats[*index];
 }
 
 void GameData::save_game() const {
@@ -118,6 +172,16 @@ void GameData::save_game() const {
 	d["best_kills"] = best_kills;
 	d["best_score"] = best_score;
 	d["last_name"] = player_name;
+	Array stats;
+	for (const PlayerStats &entry : player_stats) {
+		Dictionary item;
+		item["name"] = entry.name;
+		item["games_played"] = entry.games_played;
+		item["best_score"] = entry.best_score;
+		item["total_kills"] = entry.total_kills;
+		stats.push_back(item);
+	}
+	d["player_stats"] = stats;
 	f->store_string(JSON::stringify(d));
 }
 
@@ -145,6 +209,28 @@ void GameData::load_game() {
 		for (int i = 0; i < M_COUNT; i++) {
 			int v = int(lv.get(String(UPGRADES[i].id), 0));
 			levels[i] = std::clamp(v, 0, UPGRADES[i].max);
+		}
+	}
+	Variant stats_value = d.get("player_stats", Array());
+	if (stats_value.get_type() == Variant::ARRAY) {
+		Array stats = stats_value;
+		for (int i = 0; i < stats.size(); i++) {
+			Variant value = stats[i];
+			if (value.get_type() != Variant::DICTIONARY) {
+				continue;
+			}
+			Dictionary item = value;
+			PlayerStats entry;
+			entry.name = String(item.get("name", ""));
+			entry.games_played = std::max(0, int(item.get("games_played", 0)));
+			entry.best_score = std::max(0, int(item.get("best_score", 0)));
+			entry.total_kills = std::max(0, int(item.get("total_kills", 0)));
+			if (entry.name.strip_edges().is_empty()) {
+				continue;
+			}
+			const size_t index = player_stats.size();
+			player_stats.push_back(entry);
+			player_stats_index.insert(to_utf8_key(entry.name), index);
 		}
 	}
 }
@@ -195,8 +281,7 @@ void GameData::load_ranking() {
 		e.time = float(d.get("time", 0.0));
 		ranking.push_back(e);
 	}
-	std::stable_sort(ranking.begin(), ranking.end(),
-			[](const RankEntry &a, const RankEntry &b) { return a.score > b.score; });
+	sort_ranking(ranking);
 	if (int(ranking.size()) > MAX_RANKING) {
 		ranking.resize(MAX_RANKING);
 	}

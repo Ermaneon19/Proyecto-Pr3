@@ -1,4 +1,4 @@
-// Orquestador de la partida: mundo, camara, oleadas, colisiones (grid espacial),
+// Orquestador de la partida: mundo, camara, oleadas, colisiones espaciales,
 // armas/habilidades, experiencia/niveles y fin de partida.
 //
 // Enemigos, balas, recolectables y efectos NO son nodos: son structs en vectores
@@ -7,6 +7,9 @@
 
 #include "batch.h"
 
+#include <point2D.hpp>
+#include <quadtree.hpp>
+
 #include <godot_cpp/classes/camera3d.hpp>
 #include <godot_cpp/classes/label3d.hpp>
 #include <godot_cpp/classes/mesh_instance3d.hpp>
@@ -14,6 +17,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 namespace cc {
@@ -76,6 +80,14 @@ struct Enemy {
 	uint8_t type = E_INSECT;
 	bool elite = false;
 	bool alive = true;
+};
+
+struct EnemySpatialPoint : Designar::GenPoint2D<Designar::real_t> {
+	using Base = Designar::GenPoint2D<Designar::real_t>;
+	int enemy_index = -1;
+
+	EnemySpatialPoint(Designar::real_t x = 0.0, Designar::real_t z = 0.0, int index = -1)
+			: Base(x, z), enemy_index(index) {}
 };
 
 struct Bullet {
@@ -238,11 +250,13 @@ private:
 	float dash_trail_timer = 0.0f;
 	int target_index = -1;
 
-	// grid espacial (listas enlazadas por celda, se reconstruye cada frame)
+	// Indices espaciales para las consultas de enemigos.
 	static const int GRID_N = 64;
 	static constexpr float CELL = 2.0f;
 	std::vector<int> cell_head;
 	std::vector<int> cell_next;
+	std::unique_ptr<Designar::QuadTree<EnemySpatialPoint>> enemy_tree;
+	bool use_quadtree = true;
 	float grid_x0 = 0.0f, grid_z0 = 0.0f;
 
 	// render por lotes
@@ -292,12 +306,27 @@ private:
 	// style: 0 = normal, 1 = critico, 2 = curacion
 	void damage_number(const godot::Vector3 &pos, float amount, int style);
 
-	void rebuild_grid();
+	void rebuild_spatial_index();
 	int nearest_enemy(const godot::Vector3 &pos, float max_dist, const int *exclude_ids = nullptr, int exclude_count = 0) const;
 	int random_enemy_near(const godot::Vector3 &pos, float max_dist) const;
 
 	template <typename F>
 	inline void query(const godot::Vector3 &pos, float r, F &&fn) const {
+		if (use_quadtree) {
+			if (!enemy_tree) {
+				return;
+			}
+			using EnemyTree = Designar::QuadTree<EnemySpatialPoint>;
+			EnemyTree::Boundary range(EnemySpatialPoint(pos.x, pos.z), r);
+			Designar::DynArray<EnemySpatialPoint> found = enemy_tree->query_range(range);
+			for (const EnemySpatialPoint &point : found) {
+				if (point.enemy_index >= 0 && point.enemy_index < int(enemies.size())) {
+					fn(point.enemy_index);
+				}
+			}
+			return;
+		}
+
 		int x0 = int(std::floor((pos.x - r - grid_x0) / CELL));
 		int x1 = int(std::floor((pos.x + r - grid_x0) / CELL));
 		int z0 = int(std::floor((pos.z - r - grid_z0) / CELL));

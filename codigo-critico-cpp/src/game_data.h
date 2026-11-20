@@ -4,7 +4,11 @@
 
 #include <godot_cpp/variant/string.hpp>
 
+#include <map.hpp>
+
+#include <cstddef>
 #include <vector>
+#include <string>
 
 namespace cc {
 
@@ -46,6 +50,13 @@ struct RunResult {
 	float time = 0.0f;
 };
 
+struct PlayerStats {
+	godot::String name;
+	int games_played = 0;
+	int best_score = 0;
+	int total_kills = 0;
+};
+
 class GameData {
 public:
 	static const MetaUpgradeDef UPGRADES[M_COUNT];
@@ -62,6 +73,8 @@ public:
 	godot::String player_name; // nombre/alias registrado para la partida actual
 	RunResult last_run;
 	std::vector<RankEntry> ranking; // ordenado de mayor a menor puntaje
+	std::vector<PlayerStats> player_stats;
+	Designar::HashMap<std::string, size_t> player_stats_index;
 
 	int get_level(int id) const { return levels[id]; }
 	int get_cost(int id) const;
@@ -71,6 +84,7 @@ public:
 
 	// Empareja el nombre registrado con el puntaje final y lo guarda en el ranking.
 	void add_run_result(int score, int earned, float time_s, int kills, int level);
+	const PlayerStats *find_player_stats(const godot::String &name) const;
 
 	void save_game() const;
 	void save_ranking() const;

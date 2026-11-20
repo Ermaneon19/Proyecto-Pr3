@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 
 using namespace godot;
 
@@ -422,6 +423,7 @@ void Game::_ready() {
 		autoplay = true;
 		autoplay_god = OS::get_singleton()->get_environment("CC_AUTOPLAY") == "god";
 	}
+	use_quadtree = OS::get_singleton()->get_environment("CC_SPATIAL_INDEX") != "grid";
 	const bool demo_magnet = autoplay;
 
 	enemies.reserve(MAX_ENEMIES + 8);
@@ -585,7 +587,7 @@ void Game::_process(double p_delta) {
 
 	if (state == PLAYING) {
 		run_time += delta;
-		rebuild_grid();
+		rebuild_spatial_index();
 		update_player(delta);
 		update_weapons(delta);
 		update_spawning(delta);
@@ -1574,7 +1576,51 @@ void Game::remove_dead() {
 }
 
 // ---------------------------------------------------------------- consultas espaciales
-void Game::rebuild_grid() {
+void Game::rebuild_spatial_index() {
+	if (use_quadtree) {
+		enemy_tree.reset();
+		if (enemies.empty()) {
+			return;
+		}
+
+		float min_x = 0.0f, max_x = 0.0f, min_z = 0.0f, max_z = 0.0f;
+		bool found_enemy = false;
+		for (const Enemy &e : enemies) {
+			if (!e.alive) {
+				continue;
+			}
+			if (!found_enemy) {
+				min_x = max_x = e.pos.x;
+				min_z = max_z = e.pos.z;
+				found_enemy = true;
+			} else {
+				min_x = std::min(min_x, e.pos.x);
+				max_x = std::max(max_x, e.pos.x);
+				min_z = std::min(min_z, e.pos.z);
+				max_z = std::max(max_z, e.pos.z);
+			}
+		}
+		if (!found_enemy) {
+			return;
+		}
+
+		const float center_x = (min_x + max_x) * 0.5f;
+		const float center_z = (min_z + max_z) * 0.5f;
+		const float half_dimension = std::max({ (max_x - min_x) * 0.5f,
+				(max_z - min_z) * 0.5f, 0.5f }) + 0.01f;
+		using EnemyTree = Designar::QuadTree<EnemySpatialPoint>;
+		EnemyTree::Boundary boundary(EnemySpatialPoint(center_x, center_z), half_dimension);
+		enemy_tree = std::make_unique<EnemyTree>(boundary);
+		for (int i = 0; i < int(enemies.size()); i++) {
+			const Enemy &e = enemies[i];
+			if (e.alive) {
+				enemy_tree->insert(EnemySpatialPoint(e.pos.x, e.pos.z, i));
+			}
+		}
+		return;
+	}
+
+	enemy_tree.reset();
 	Vector3 p = player->get_position();
 	float half = GRID_N * CELL * 0.5f;
 	grid_x0 = std::floor(p.x / CELL) * CELL - half;
@@ -1598,15 +1644,14 @@ void Game::rebuild_grid() {
 int Game::nearest_enemy(const Vector3 &pos, float max_dist, const int *exclude_ids, int exclude_count) const {
 	int best = -1;
 	float best_d = max_dist * max_dist;
-	int n = int(enemies.size());
-	for (int i = 0; i < n; i++) {
+	query(pos, max_dist, [&](int i) {
 		const Enemy &e = enemies[i];
 		if (!e.alive) {
-			continue;
+			return;
 		}
 		float d = dist2_xz(e.pos, pos);
 		if (d >= best_d) {
-			continue;
+			return;
 		}
 		bool skip = false;
 		for (int k = 0; k < exclude_count; k++) {
@@ -1619,17 +1664,16 @@ int Game::nearest_enemy(const Vector3 &pos, float max_dist, const int *exclude_i
 			best_d = d;
 			best = i;
 		}
-	}
+	});
 	return best;
 }
 
 int Game::random_enemy_near(const Vector3 &pos, float max_dist) const {
-	// Muestreo de reserva: elige uno al azar sin crear una lista temporal.
+	// Reservoir sampling picks a nearby enemy without allocating a temporary list.
 	int chosen = -1;
 	int seen = 0;
 	float md2 = max_dist * max_dist;
-	int n = int(enemies.size());
-	for (int i = 0; i < n; i++) {
+	query(pos, max_dist, [&](int i) {
 		const Enemy &e = enemies[i];
 		if (e.alive && dist2_xz(e.pos, pos) < md2) {
 			seen++;
@@ -1637,7 +1681,7 @@ int Game::random_enemy_near(const Vector3 &pos, float max_dist) const {
 				chosen = i;
 			}
 		}
-	}
+	});
 	return chosen;
 }
 

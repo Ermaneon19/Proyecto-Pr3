@@ -10,6 +10,9 @@ Las escenas `.tscn` solo contienen un nodo raíz cuyo tipo es una clase C++.
 2. Pulsa **F5**.
 
 Las librerías ya están compiladas en `project/bin/` para Linux y Windows (x86_64).
+Los algoritmos y estructuras de datos de DeSiGNAR se incluyen como submódulo:
+clona el repositorio con `git clone --recurse-submodules` o ejecuta
+`git submodule update --init --recursive` antes de compilar.
 
 ## Cómo compilar
 
@@ -37,6 +40,9 @@ Requisitos (ya instalados en este WSL): `scons`, `g++` y `g++-mingw-w64-x86-64-p
 Al morir, `Game::on_player_died()` llama a `GameData::add_run_result()`, que empareja
 el nombre registrado con el puntaje final, lo inserta ordenado en el ranking y lo
 guarda en `user://ranking.json` (los núcleos y mejoras van en `user://save.json`).
+El ranking usa `merge_sort` de DeSiGNAR al cargar, ordenando por puntaje, tiempo,
+nivel y bajas. Las estadísticas históricas por jugador se indexan con
+`HashMap<std::string, size_t>` y se muestran en la pantalla de ranking.
 
 **Puntaje** = bajas × 10 + élites × 150 + segundos × 2 + (nivel − 1) × 25.
 
@@ -79,6 +85,10 @@ En la versión GDScript cada enemigo era un nodo con ~20 `MeshInstance3D`.
 Ahora enemigos, balas, cristales y efectos son structs en vectores contiguos y se
 dibujan con 7 MultiMesh (una llamada de dibujo cada uno), con un grid espacial
 reconstruido cada frame para las colisiones. El límite subió de 180 a 320 enemigos.
+La búsqueda espacial usa el `QuadTree` de DeSiGNAR. Para comparar la grilla de
+referencia con el árbol, inicia el juego con `CC_SPATIAL_INDEX=grid`; el valor
+predeterminado es `quadtree`. Usa el profiler de Godot bajo la misma escena y
+duración para comparar ambos backends.
 
 ## Balance rápido
 
